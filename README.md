@@ -1,13 +1,4 @@
-challenge-app/
-│
-├── backend/
-│   ├── server.js
-│   ├── routes/
-│   └── models/
-│
-├── frontend/
-│   ├── src/
-│   └── public/
-│
-├── README.md
-└── package.json
+cd backend
+npm init -y
+npm install express cors
+node server.js
