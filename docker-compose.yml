@@ -1,0 +1,75 @@
+# 🐳 Docker Compose для Parrykg
+
+version: '3.8'
+
+services:
+  # MongoDB база данных
+  mongodb:
+    image: mongo:latest
+    container_name: parrykg-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: parrykg
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - parrykg-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Backend сервер
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: parrykg-backend
+    ports:
+      - "3003:3003"
+    environment:
+      NODE_ENV: development
+      MONGODB_URI: mongodb://admin:admin123@mongodb:27017/parrykg
+      JWT_SECRET: your_super_secret_jwt_key_change_in_production
+      STRIPE_SECRET_KEY: sk_test_demo_key_for_development
+      PORT: 3003
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - parrykg-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    restart: unless-stopped
+    command: npm run dev
+
+  # Frontend сервер (опционально для production)
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   container_name: parrykg-frontend
+  #   ports:
+  #     - "5173:5173"
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - parrykg-network
+  #   command: npm run dev
+
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
+
+networks:
+  parrykg-network:
+    driver: bridge

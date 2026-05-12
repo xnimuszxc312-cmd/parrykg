@@ -1,257 +1,111 @@
-cd backend
-npm install
-cp .env.example .env
-npm start# Parrykg Backend
+# ❤ Parrykg - Современная платежная система
 
-Этот проект представляет собой серверную часть для приложения Parrykg с использованием платежных систем и систем проверки.
+[![Node.js](https://img.shields.io/badge/Node.js-v14.0.0+-green.svg)](https://nodejs.org)
+[![Vue.js](https://img.shields.io/badge/Vue.js-v3.3.4-green.svg)](https://vuejs.org)
+[![MongoDB](https://img.shields.io/badge/MongoDB-v4.4+-green.svg)](https://mongodb.com)
+[![Express](https://img.shields.io/badge/Express-v4.18.2-blue.svg)](https://expressjs.com)
+[![Stripe](https://img.shields.io/badge/Stripe-API-blue.svg)](https://stripe.com)
+[![Docker](https://img.shields.io/badge/Docker-Compatible-blue.svg)](https://docker.com)
+[![License](https://img.shields.io/badge/License-ISC-blue.svg)](#)
 
-## 🚀 Быстрый старт
+## 🎯 Описание
 
-### 1. Перейдите в папку backend:
+**Parrykg** - это полнофункциональное веб-приложение для обработки платежей с современным интерфейсом. Включает в себя:
 
-```bash
-cd backend
-```
+✅ Аутентификацию пользователей (регистрация/вход)  
+✅ JWT токены для безопасности (24 часа)  
+✅ Интеграцию Stripe для обработки платежей  
+✅ MongoDB базу данных  
+✅ Адаптивный UI с Vue.js 3  
+✅ Docker контейнеризацию  
 
-### 2. Установите зависимости:
+---
 
-```bash
-npm install
-```
+## 🚀 Быстрый старт (2 способа)
 
-### 3. Создайте файл `.env` на основе примера:
-
-```bash
-cp .env.example .env
-```
-
-### 4. Настройте переменные окружения в файле `.env`:
-
-```
-STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key_here
-JWT_SECRET=your_super_secret_jwt_key_change_in_production
-MONGODB_URI=mongodb://localhost:27017/parrykg
-PORT=3003
-NODE_ENV=development
-```
-
-### 5. Убедитесь, что MongoDB запущена:
+### Способ 1: Docker Compose ⭐ РЕКОМЕНДУЕТСЯ
 
 ```bash
-docker run -d --name mongodb -p 27017:27017 mongo:latest
+# Требуется: Docker Desktop
+
+git clone https://github.com/xnimuszxc312-cmd/parrykg.git
+cd parrykg
+
+# Запустить все сервисы одновременно
+docker-compose up -d
+
+# Откройте в браузере
+http://localhost:5173  # Frontend
+http://localhost:3003  # Backend API
 ```
 
-### 6. Запустите сервер:
+✅ **MongoDB автоматически запустится в контейнере!**
+
+### Способ 2: Локальная установка
 
 ```bash
-npm start
+# Требуется: Node.js, MongoDB, npm
+
+git clone https://github.com/xnimuszxc312-cmd/parrykg.git
+cd parrykg
+
+# Установить зависимости
+npm run install:all
+
+# Запустить MongoDB в Docker
+docker run -d --name parrykg-mongodb -p 27017:27017 mongo:latest
+
+# Запустить приложение
+npm run dev
+
+# Откройте в браузере
+http://localhost:5173  # Frontend
 ```
 
-Сервер будет запущен по адресу `http://localhost:3003`.
+---
 
-## 📡 API Endpoints
+## 🏗️ Архитектура
 
-### Аутентификация
-
-#### POST `/auth/register`
-Регистрация нового пользователя.
-
-**Требуемые параметры:**
-- `email` - адрес электронной почты
-- `password` - пароль пользователя
-- `username` (опционально) - имя пользователя
-
-**Пример запроса:**
-```bash
-curl -X POST http://localhost:3003/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "password123",
-    "username": "john_doe"
-  }'
+```
+┌─────────────────┐
+│  Frontend       │  Vue 3 + Vite
+│  Port 5173      │  Responsive UI
+└────────┬────────┘
+         │ HTTP/REST
+         ↓
+┌─────────────────┐
+│  Backend        │  Express.js
+│  Port 3003      │  JWT Auth
+├─────────────────┤  Stripe Integration
+│  MongoDB        │  Database
+│  Port 27017     │  Collections: Users
+└─────────────────┘
 ```
 
-**Пример ответа:**
-```json
-{
-  "message": "✓ Пользователь успешно зарегистрирован",
-  "userId": "507f1f77bcf86cd799439011",
-  "email": "user@example.com"
-}
-```
+---
 
-#### POST `/auth/login`
-Логин пользователя и получение JWT токена.
+## 📋 Возможности
 
-**Требуемые параметры:**
-- `email` - адрес электронной почты
-- `password` - пароль пользователя
+### 🔐 Безопасность
+- Bcryptjs хеширование паролей (10 salt rounds)
+- JWT токены с проверкой на каждый запрос
+- CORS защита
+- Input валидация
+- Защита маршрутов
 
-**Пример запроса:**
-```bash
-curl -X POST http://localhost:3003/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "password123"
-  }'
-```
+### 💳 Платежи
+- Интеграция с Stripe API
+- Payment Intent создание
+- Поддержка многих валют (USD, EUR, GBP, RUB)
+- Минимальная сумма $0.50
 
-**Пример ответа:**
-```json
-{
-  "message": "✓ Вы успешно вошли",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "userId": "507f1f77bcf86cd799439011",
-    "email": "user@example.com",
-    "username": "john_doe"
-  }
-}
-```
+### 📱 UI/UX
+- Адаптивный дизайн (mobile/tablet/desktop)
+- Гладкие анимации
+- Яркие градиент кнопки
+- Интуитивная навигация
 
-### Платежи (требуется аутентификация)
-
-#### POST `/payment/create-intent`
-Создание платежного намерения. Требует JWT токена в заголовке `Authorization`.
-
-**Требуемые параметры:**
-- `amount` - сумма в центах (минимум 50 центов)
-- `currency` (опционально) - валюта (по умолчанию 'usd')
-- `description` (опционально) - описание платежа
-
-**Пример запроса:**
-```bash
-curl -X POST http://localhost:3003/payment/create-intent \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
-  -d '{
-    "amount": 2000,
-    "currency": "usd",
-    "description": "Покупка подписки"
-  }'
-```
-
-**Пример ответа:**
-```json
-{
-  "message": "✓ Платежное намерение создано",
-  "clientSecret": "pi_3KxZ..._secret_...",
-  "paymentIntentId": "pi_3KxZ...",
-  "amount": 2000,
-  "currency": "usd",
-  "status": "requires_payment_method"
-}
-```
-
-#### POST `/payment/confirm-intent`
-Получение информации о платежном намерении.
-
-**Требуемые параметры:**
-- `paymentIntentId` - ID платежного намерения
-
-**Пример запроса:**
-```bash
-curl -X POST http://localhost:3003/payment/confirm-intent \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
-  -d '{
-    "paymentIntentId": "pi_3KxZ..."
-  }'
-```
-
-### Дополнительные маршруты
-
-#### GET `/`
-Приветственное сообщение.
-
-```bash
-curl http://localhost:3003/
-```
-
-**Ответ:**
-```json
-{
-  "message": "❤ Добро пожаловать на Parrykg Backend API"
-}
-```
-
-#### GET `/health`
-Проверка здоровья сервера.
-
-```bash
-curl http://localhost:3003/health
-```
-
-**Ответ:**
-```json
-{
-  "status": "healthy",
-  "timestamp": "2026-03-23T10:30:45.123Z"
-}
-```
-
-#### GET `/protected`
-Защищенный маршрут (требует JWT токена).
-
-```bash
-curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
-  http://localhost:3003/protected
-```
-
-**Ответ:**
-```json
-{
-  "message": "✓ Это защищенный маршрут",
-  "user": {
-    "userId": "507f1f77bcf86cd799439011",
-    "email": "user@example.com"
-  }
-}
-```
-
-## 🔑 Переменные окружения
-
-| Переменная | Описание | Пример |
-|---|---|---|
-| `STRIPE_SECRET_KEY` | Секретный ключ Stripe для обработки платежей | `sk_test_...` |
-| `JWT_SECRET` | Секретный ключ для подписания JWT токенов | `your_secret_key` |
-| `MONGODB_URI` | URL подключения к MongoDB | `mongodb://localhost:27017/parrykg` |
-| `PORT` | Порт, на котором запускается сервер | `3003` |
-| `NODE_ENV` | Окружение: development/production | `development` |
-
-⚠️ **ВАЖНО:** В продакшене обязательно измените значение `JWT_SECRET` на надежный ключ!
-
-## 📦 Зависимости
-
-- **express** - веб-фреймворк для Node.js
-- **cors** - middleware для обработки CORS запросов
-- **stripe** - SDK для работы с платежами Stripe
-- **jsonwebtoken** - создание и проверка JWT токенов
-- **bcryptjs** - хеширование паролей
-- **mongoose** - ODM для работы с MongoDB
-- **dotenv** - загрузка переменных окружения из файла .env
-
-## 🗄️ База данных
-
-Проект использует MongoDB для хранения данных пользователей.
-
-### Запуск MongoDB локально через Docker:
-
-```bash
-docker run -d \
-  --name parrykg-mongodb \
-  -p 27017:27017 \
-  -e MONGO_INITDB_DATABASE=parrykg \
-  mongo:latest
-```
-
-### Проверка подключения:
-
-```bash
-docker exec -it parrykg-mongodb mongosh
-```
+---
 
 ## 📁 Структура проекта
 
@@ -259,85 +113,187 @@ docker exec -it parrykg-mongodb mongosh
 parrykg/
 ├── backend/
 │   ├── routes/
-│   │   ├── auth.js           # Маршруты аутентификации
-│   │   └── payment.js        # Маршруты платежей
+│   │   ├── auth.js          # Регистрация, вход
+│   │   └── payment.js       # Платежи
 │   ├── models/
-│   │   └── User.js           # Модель пользователя
-│   ├── server.js             # Главный файл сервера
-│   ├── package.json          # Зависимости проекта
-│   └── .env.example          # Пример переменных окружения
-├── frontend/                 # Frontend приложение
+│   │   └── User.js          # MongoDB модель
+│   ├── server.js            # Express сервер
+│   ├── .env                 # Переменные окружения
+│   ├── Dockerfile           # Docker для backend
+│   └── package.json
+│
+├── frontend/
 │   ├── src/
-│   └── public/
-├── README.md                 # Данная документация
-└── .gitignore               # Файлы, которые игнорируются Git
+│   │   ├── pages/
+│   │   │   ├── Home.vue
+│   │   │   ├── Login.vue
+│   │   │   ├── Register.vue
+│   │   │   ├── Dashboard.vue
+│   │   │   └── Payment.vue
+│   │   ├── App.vue
+│   │   ├── main.js
+│   │   ├── router.js
+│   │   └── style.css
+│   ├── index.html
+│   ├── vite.config.js
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   └── package.json
+│
+├── docker-compose.yml       # Docker Compose конфигурация
+├── package.json             # Root package.json
+├── SETUP.md                 # Руководство установки
+├── DEMO.md                  # Демонстрация
+├── DOCKER.md                # Docker инструкции
+└── README.md                # Этот файл
 ```
 
-## 🛠️ Локальная разработка
+---
 
-### Установка зависимостей для разработки:
+## 🧪 Тестирование
+
+### Test аккаунты
+
+```
+Email: test@example.com
+Пароль: password123
+Имя: Test User
+```
+
+### Stripe Test Cards
+
+```
+✅ Успешный платеж:
+   4242 4242 4242 4242
+   12/25, CVC: 123
+
+❌ Отклоненный платеж:
+   4000 0000 0000 0002
+   12/25, CVC: 123
+```
+
+### API Endpoints
 
 ```bash
-cd backend
-npm install --save-dev nodemon
+# Регистрация
+POST /auth/register
+{
+  "email": "test@example.com",
+  "password": "password123",
+  "username": "Test User"
+}
+
+# Вход
+POST /auth/login
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+# Создание платежа (нужен JWT токен)
+POST /payment/create-intent
+Header: Authorization: Bearer <token>
+{
+  "amount": 1000,
+  "currency": "usd",
+  "description": "Платеж за подписку"
+}
 ```
 
-### Запуск с автоперезагрузкой:
+---
+
+## 🐳 Docker команды
 
 ```bash
-npm run dev
+# Запустить все сервисы
+docker-compose up -d
+
+# Остановить все сервисы
+docker-compose down
+
+# Просмотр логов
+docker-compose logs -f
+
+# Перезапустить конкретный сервис
+docker-compose restart backend
+
+# Удалить всё включая volumes
+docker-compose down -v
+
+# Просмотреть статус
+docker-compose ps
 ```
 
-## 📝 Примеры использования
+---
 
-### Полный цикл регистрации и платежа:
+## 🛠️ Требования для разработки
 
-```bash
-# 1. Регистрация
-curl -X POST http://localhost:3003/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "test@example.com",
-    "password": "secure123"
-  }'
+### Способ 1: Docker (рекомендуется)
+- Docker Desktop v4.0+
+- Docker Compose v2.0+
+- 2GB свободной оперативной памяти
 
-# 2. Login и получение токена
-TOKEN=$(curl -X POST http://localhost:3003/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "test@example.com",
-    "password": "secure123"
-  }' | jq -r '.token')
+### Способ 2: Локальная разработка
+- Node.js v14.0.0+
+- npm v6.0.0+
+- MongoDB v4.4+
+- Git
 
-# 3. Создание платежного намерения
-curl -X POST http://localhost:3003/payment/create-intent \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
-  -d '{
-    "amount": 5000,
-    "currency": "usd",
-    "description": "Подписка"
-  }'
-```
+---
 
-## 🐛 Решение проблем
+## 📚 Документация
 
-### MongoDB подключение не удается:
-- Убедитесь, что MongoDB работает: `docker ps`
-- Проверьте переменную `MONGODB_URI` в `.env`
+- **[SETUP.md](./SETUP.md)** - Полное руководство установки
+- **[DEMO.md](./DEMO.md)** - Демонстрация функциональности
+- **[DOCKER.md](./DOCKER.md)** - Docker инструкции
 
-### Stripe ошибки:
-- Проверьте, что `STRIPE_SECRET_KEY` правильно установлен
-- Используйте тестовые ключи для разработки
+---
 
-### Ошибки JWT:
-- Убедитесь, что токен передается в заголовке: `Authorization: Bearer TOKEN`
-- Проверьте, что `JWT_SECRET` совпадает при создании и проверке токена
+## 🔗 Полезные ссылки
 
-## 📞 Поддержка
+| Ресурс | URL |
+|--------|-----|
+| Frontend | http://localhost:5173 |
+| Backend | http://localhost:3003 |
+| MongoDB | localhost:27017 |
+| Health Check | http://localhost:3003/health |
 
-Для вопросов и проблем, пожалуйста, создайте Issue в GitHub репозитории.
+---
+
+## 🤝 Контрибьютинг
+
+1. Fork репозиторий
+2. Создайте feature branch (`git checkout -b feature/improvement`)
+3. Commit изменения (`git commit -m 'Add improvement'`)
+4. Push на branch (`git push origin feature/improvement`)
+5. Откройте Pull Request
+
+---
 
 ## 📄 Лицензия
 
-ISC
+ISC License - см. [LICENSE](./LICENSE) файл
+
+---
+
+## 👨‍💻 Об авторе
+
+**xnimuszxc312-cmd**
+- GitHub: [@xnimuszxc312-cmd](https://github.com/xnimuszxc312-cmd)
+- Email: xnimuszxc312@gmail.com
+
+---
+
+## 🙏 Благодарности
+
+- Vue.js сообщество
+- Express.js авторы
+- MongoDB команда
+- Stripe разработчики
+
+---
+
+**Made with ❤️ by xnimuszxc312-cmd**
+
+*Дата создания: Май 2026*  
+*Последнее обновление: 12 Май 2026*

@@ -8,7 +8,11 @@
     "backend": "cd backend && npm run dev",
     "frontend": "cd frontend && npm run dev",
     "build": "cd frontend && npm run build",
-    "preview": "cd frontend && npm run preview"
+    "preview": "cd frontend && npm run preview",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:clean": "docker-compose down -v"
   },
   "keywords": ["vue", "express", "stripe", "mongodb", "payment"],
   "author": "xnimuszxc312-cmd",
