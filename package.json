@@ -1,0 +1,19 @@
+{
+  "name": "parrykg",
+  "version": "1.0.0",
+  "description": "Полное приложение Parrykg - платежная система на Vue.js и Node.js",
+  "scripts": {
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install && cd ..",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "preview": "cd frontend && npm run preview"
+  },
+  "keywords": ["vue", "express", "stripe", "mongodb", "payment"],
+  "author": "xnimuszxc312-cmd",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
